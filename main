@@ -1,54 +1,10 @@
-local Players = game:GetService("Players")
-local Workspace = game:GetService("Workspace")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CollectionService = game:GetService("CollectionService")
-local VirtualUser = game:GetService("VirtualUser")
-local player = Players.LocalPlayer
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-
--- === CONFIG ===
-local oresFolder = Workspace:WaitForChild("__GAME_CONTENT"):WaitForChild("Ores")
-_G.MiningSpeed = 0.5
-_G.AutoHarvest = false
-_G.AutoRollTier = false
-_G.AutoHitTree = false
-_G.AutoBlazeQuest = false
-_G.AntiAFK = false
-
-local M2Settings = {} 
-local RuneNames = {"Basic", "Super", "Advanced", "Cosmic Prism", "Hacker", "Snowy", "Deepcore"}
-local RuneSettings = {}
-for _, name in ipairs(RuneNames) do RuneSettings[name] = false end
-
--- === ANTI AFK DÖNGÜSÜ ===
-player.Idled:Connect(function()
-    if _G.AntiAFK then
-        VirtualUser:Button2Down(Vector2.new(0, 0), Workspace.CurrentCamera.CFrame)
-        task.wait(1)
-        VirtualUser:Button2Up(Vector2.new(0, 0), Workspace.CurrentCamera.CFrame)
-    end
-end)
-
--- === DÖNGÜLER (0.2 Saniye Stabil Hız) ===
-
--- 1. HARVEST (Hızlı Ama Dengeli)
-task.spawn(function()
-    while true do
-        if _G.AutoHarvest == true then
-            local slots = CollectionService:GetTagged("WheatSlot")
-            for _, slot in ipairs(slots) do
-                if _G.AutoHarvest == false then break end
-                local cd = slot:FindFirstChildOfClass("ClickDetector")
-                if cd and slot:FindFirstChild("5") then
-                    fireclickdetector(cd)
-                end
             end
         end
-        task.wait(0.2)
+        task.wait(_G.HarvestSpeed)
     end
 end)
 
--- 2. STABİL TIER ROLL DÖNGÜSÜ
+-- 2. STABIL TIER ROLL DONGUSU
 task.spawn(function()
     while true do
         if _G.AutoRollTier then
@@ -59,11 +15,11 @@ task.spawn(function()
                 end
             end)
         end
-        task.wait(0.2)
+        task.wait(_G.TierSpeed)
     end
 end)
 
--- 3. STABİL RUNE ROLL DÖNGÜSÜ
+-- 3. STABIL RUNE ROLL DONGUSU
 task.spawn(function()
     while true do
         pcall(function()
@@ -76,11 +32,11 @@ task.spawn(function()
                 end
             end
         end)
-        task.wait(0.2)
+        task.wait(_G.RuneSpeed)
     end
 end)
 
--- 4. STABİL TREE HIT DÖNGÜSÜ
+-- 4. STABIL TREE HIT DONGUSU
 task.spawn(function()
     while true do
         if _G.AutoHitTree then
@@ -91,11 +47,11 @@ task.spawn(function()
                 end
             end)
         end
-        task.wait(0.2)
+        task.wait(_G.TreeSpeed)
     end
 end)
 
--- 5. BLAZE QUEST DÖNGÜSÜ
+-- 5. BLAZE QUEST DONGUSU
 task.spawn(function()
     while true do
         if _G.AutoBlazeQuest then
@@ -107,7 +63,7 @@ task.spawn(function()
                 end
             end)
         end
-        task.wait(5)
+        task.wait(_G.BlazeQuestSpeed)
     end
 end)
 
@@ -123,7 +79,7 @@ task.spawn(function()
                         if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
                             player.Character.HumanoidRootPart.CFrame = obj:GetPivot() + Vector3.new(0, 5, 0)
                             found = true
-                            break 
+                            break
                         end
                     end
                 end
@@ -134,8 +90,8 @@ end)
 
 -- === GUI ===
 local Window = Rayfield:CreateWindow({
-    Name = "⚡ Sqays Noob Incremental", 
-    LoadingTitle = "Yükleniyor...", 
+    Name = "Sqays Noob Incremental",
+    LoadingTitle = "Yukleniyor...",
     ConfigurationSaving = {Enabled = true, FileName = "SqaysConfig"}
 })
 
@@ -176,19 +132,29 @@ for i = 1, 12 do
                         local MainRemote = ReplicatedStorage:FindFirstChild("__Net") and ReplicatedStorage.__Net:FindFirstChild("MainRemote")
                         if MainRemote then MainRemote:FireServer("PressButton", i) end
                     end)
-                    task.wait(0.2) -- Ice convert de aynı şekilde stabile çekildi
+                    task.wait(_G.IceConvertSpeed)
                 end
             end)
         end,
     })
 end
 
--- Misc Tab
-local MiscTab = Window:CreateTab("Misc", 2)
-MiscTab:CreateSection("Settings")
-MiscTab:CreateDropdown({Name = "Mining Speed", Options = {"0.1", "0.2", "0.5", "1", "2", "3"}, CurrentOption = {"0.5"}, Callback = function(o) _G.MiningSpeed = tonumber(o[1]) end})
+-- Speed Tab
+local SpeedTab = Window:CreateTab("Speed", 2)
+local SpeedOptions = {"0.05", "0.1", "0.2", "0.5", "1", "2", "3", "5"}
 
-MiscTab:CreateSection("Anti-Idle")
-MiscTab:CreateToggle({Name = "Anti AFK (No Jump)", Callback = function(v) _G.AntiAFK = v end})
+SpeedTab:CreateSection("Main Speeds")
+SpeedTab:CreateDropdown({Name = "Mining Speed", Options = SpeedOptions, CurrentOption = {"0.5"}, Callback = function(o) _G.MiningSpeed = tonumber(o[1]) end})
+SpeedTab:CreateDropdown({Name = "Tier Speed", Options = SpeedOptions, CurrentOption = {"0.2"}, Callback = function(o) _G.TierSpeed = tonumber(o[1]) end})
+SpeedTab:CreateDropdown({Name = "Rune Speed", Options = SpeedOptions, CurrentOption = {"0.2"}, Callback = function(o) _G.RuneSpeed = tonumber(o[1]) end})
+SpeedTab:CreateDropdown({Name = "Ice Convert Speed", Options = SpeedOptions, CurrentOption = {"0.2"}, Callback = function(o) _G.IceConvertSpeed = tonumber(o[1]) end})
+
+SpeedTab:CreateSection("Extra Speeds")
+SpeedTab:CreateDropdown({Name = "Harvest Speed", Options = SpeedOptions, CurrentOption = {"0.2"}, Callback = function(o) _G.HarvestSpeed = tonumber(o[1]) end})
+SpeedTab:CreateDropdown({Name = "Tree Speed", Options = SpeedOptions, CurrentOption = {"0.2"}, Callback = function(o) _G.TreeSpeed = tonumber(o[1]) end})
+SpeedTab:CreateDropdown({Name = "Blaze Quest Speed", Options = SpeedOptions, CurrentOption = {"5"}, Callback = function(o) _G.BlazeQuestSpeed = tonumber(o[1]) end})
+
+SpeedTab:CreateSection("Anti-Idle")
+SpeedTab:CreateToggle({Name = "Anti AFK (No Jump)", Callback = function(v) _G.AntiAFK = v end})
 
 Rayfield:LoadConfiguration()
