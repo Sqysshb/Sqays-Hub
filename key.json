@@ -1,11 +1,4 @@
-JSON
 {
-  "master_key": "SqaysMasterKey",
-  "keys": {
-    "SQ7X9V2M": 1782503224,
-    "SQ4B1Z8K": 1782589624,
-    "SQ9L3P5R": 1782676024,
-    "SQ2D6N7H": 1782762424,
-    "SQ8C4F9J": 1782848824
-  }
+  "master_key": "SqaysTheTimeless",
+  "active_key": "SQ-D1K1-8824"
 }
